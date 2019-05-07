@@ -65,4 +65,4 @@ vyos_image: vyos117
 utility: utility_0502
 
 # Keys
-aws_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ7rBIPVF0VuCq57YTZgqb3j6gyF1GsByJjturC93a1yD1Vsl8I2Q3eFAKrqoibEC9Varc1YDnKa6HP3Hjx7A41UuK0lwCNy56fb9i0Mzj6eAlJmdTVz6FI1lE905AaeQG+iXwU/WvznJXapSvzmGSE8dVfq9IM8sdQlObACz9usf17nqnd0xynEX7G/t2mJOiWI3yvWVH1y+HTcxieDOXt7EeZonj/rOcpGI6Yny8WCI3gdn9LVAYQhCGzwHyMAAVztl6RFzTkNj+tXRYMrfV5HDKBUH48IVTd9c2di/wUrLnw9x3QCNtmFwfePzpbhkT/tGDOUakhTN82IUG2zPD dev@ip-172-31-31-61.us-east-2.compute.internal"
+aws_key: "ssh-rsa .."
