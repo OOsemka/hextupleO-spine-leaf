@@ -1,0 +1,68 @@
+---
+# OpenStack Keystone URL
+os_auth: http://X.X.X.X:5000/v3
+
+# OpenStack project and user
+cloud_admin: admin
+admin_project: admin
+# OpenStack user password
+admin_password: secret
+# Keystone / LDAP domain
+domain_id: default
+# User passwords
+pwd_alias: "{{ lookup('password', '/dev/null length=8 chars=ascii_letters') }}"
+# Number of supported users
+count: 10
+
+# Projects
+Projects:
+ - spine_leaf_vanilla
+   
+networks:
+  - { name: "external1", cidr: "10.1.1.0/24" }
+  - { name: "provisioning1", cidr: "10.10.1.0/24" }
+  - { name: "external2", cidr: "10.1.2.0/24" }
+  - { name: "provisioning2", cidr: "10.10.2.0/24" }
+  - { name: "internalAPI2", cidr: "10.20.2.0/24" }
+  - { name: "tenant2", cidr: "10.30.2.0/24" }
+  - { name: "storage2", cidr: "10.40.2.0/24" }
+  - { name: "storagemgmt2", cidr: "10.50.2.0/24" }
+  - { name: "provider2", cidr: "10.60.2.0/24" }
+  - { name: "provisioning3", cidr: "10.10.3.0/24" }
+  - { name: "internalAPI3", cidr: "10.20.3.0/24" }
+  - { name: "tenant3", cidr: "10.30.3.0/24" }
+  - { name: "storage3", cidr: "10.40.3.0/24" }
+  - { name: "storagemgmt3", cidr: "10.50.3.0/24" }
+  - { name: "provider3", cidr: "10.60.3.0/24" }
+  - { name: "provisioning4", cidr: "10.10.4.0/24" }
+  - { name: "internalAPI4", cidr: "10.20.4.0/24" }
+  - { name: "tenant4", cidr: "10.30.4.0/24" }
+  - { name: "storage4", cidr: "10.40.4.0/24" }
+  - { name: "storagemgmt4", cidr: "10.50.4.0/24" }
+  - { name: "provider4", cidr: "10.60.4.0/24" }
+  - { name: "transit", cidr: "10.254.1.0/24" }
+
+Instances:
+ - controller
+ - compute1
+ - compute2
+
+# openstack project keypair (should be set to ansible server id_rsa.pub)
+keypair: ansible
+
+
+# Flavors
+flavor_undercloud: undercloud
+flavor_controller: overcloud-controller
+flavor_compute: overcloud-compute
+flavor_vyos: overcloud-vyos
+flavor_utility: utility
+
+#images
+pxe_image: pxeboot.raw
+undercloud_vanilla_image: undercloud_chris_0423
+vyos_image: vyos117
+utility: utility_0502
+
+# Keys
+aws_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ7rBIPVF0VuCq57YTZgqb3j6gyF1GsByJjturC93a1yD1Vsl8I2Q3eFAKrqoibEC9Varc1YDnKa6HP3Hjx7A41UuK0lwCNy56fb9i0Mzj6eAlJmdTVz6FI1lE905AaeQG+iXwU/WvznJXapSvzmGSE8dVfq9IM8sdQlObACz9usf17nqnd0xynEX7G/t2mJOiWI3yvWVH1y+HTcxieDOXt7EeZonj/rOcpGI6Yny8WCI3gdn9LVAYQhCGzwHyMAAVztl6RFzTkNj+tXRYMrfV5HDKBUH48IVTd9c2di/wUrLnw9x3QCNtmFwfePzpbhkT/tGDOUakhTN82IUG2zPD dev@ip-172-31-31-61.us-east-2.compute.internal"

@@ -1,0 +1,3 @@
+---
+   # state indicates we either want to create or delete object
+   state: absent

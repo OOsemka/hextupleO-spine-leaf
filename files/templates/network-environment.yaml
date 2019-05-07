@@ -1,0 +1,75 @@
+resource_registry:
+  OS::TripleO::ControllerLeaf2::Net::SoftwareConfig: /home/stack/templates/nics/controllerleaf2.yaml
+  OS::TripleO::ComputeLeaf3::Net::SoftwareConfig: /home/stack/templates/nics/computeleaf3.yaml
+  OS::TripleO::ComputeLeaf4::Net::SoftwareConfig: /home/stack/templates/nics/computeleaf4.yaml
+
+parameter_defaults:
+  ControlPlaneSubnet: leaf2
+  ControllerLeaf2ControlPlaneSubnet: leaf2
+  ComputeLeaf3ControlPlaneSubnet: leaf3
+  ComputeLeaf4ControlPlaneSubnet: leaf4
+  ControlPlaneDefaultRoute: 10.10.2.1
+  ControlPlaneSubnetCidr: '24'
+  ControlPlane2DefaultRoute: 10.10.2.1
+  ControlPlane2SubnetCidr: '24'
+  ControlPlane3DefaultRoute: 10.10.3.1
+  ControlPlane3SubnetCidr: '24'
+  ControlPlane4DefaultRoute: 10.10.4.1
+  ControlPlane4SubnetCidr: '24'
+  InternalApiSupernet: 10.20.0.0/16
+  TenantSupernet: 10.30.0.0/16
+  StorageSupernet: 10.40.0.0/16
+  StorageMgmtSupernet: 10.50.0.0/16
+  ProvisioningSupernet: 10.10.0.0/16
+  EC2MetadataIp: 10.10.1.10
+  Leaf2EC2MetadataIp: 10.10.1.10
+  Leaf3EC2MetadataIp: 10.10.1.10
+  Leaf4EC2MetadataIp: 10.10.1.10
+  DnsServers: 10.10.1.10
+  NtpServer: 10.10.1.10
+  CloudDomain: spineleaf.lab
+  CloudName: overcloud.spineleaf.lab
+  NeutronNetworkType: 'vxlan,vlan'
+  NeutronTunnelTypes: 'vxlan'
+  NeutronGlobalPhysnetMtu: 1472
+  NeutronEnableIsolatedMetadata: true
+  NeutronEnableForceMetadata: true
+  NeutronEnableMetadataNetwork: true
+  NeutronBridgeMappings: 'datacentre:br-ex,provider:br-provider,provider3:br-provider3,provider4:br-provider4'
+  NeutronFlatNetworks: 'datacentre,provider,provider3,provider4'
+  ServiceNetMap:
+    ComputeLeaf3HostnameResolveNetwork: internal_api3
+    ComputeLeaf4HostnameResolveNetwork: internal_api4
+  VipSubnetMap:
+    ctlplane: leaf2
+  DockerInsecureRegistryAddress:
+  - 10.10.1.20:8787
+  NovaComputeLibvirtType: qemu
+
+
+  ComputeLeaf3ExtraConfig:
+    nova::compute::libvirt::vncserver_listen: "%{hiera('internal_api3')}"
+    nova::compute::vncserver_proxyclient_address: "%{hiera('internal_api3')}"
+    nova::compute::libvirt::virt_type: qemu
+    nova::compute::libvirt::cpu_mode: "host-passthrough"
+    neutron::agents::ml2::ovs::local_ip: "%{hiera('tenant3')}"
+    cold_migration_ssh_inbound_addr: "%{hiera('internal_api3')}"
+    live_migration_ssh_inbound_addr: "%{hiera('internal_api3')}"
+    nova::migration::libvirt::live_migration_inbound_addr: "%{hiera('internal_api3')}"
+    nova::my_ip: "%{hiera('internal_api3')}"
+    tripleo::profile::base::database::mysql::client::mysql_client_bind_address: "%{hiera('internal_api3')}"
+    neutron::agents::dhcp::availability_zone: 'leaf3'
+
+  ComputeLeaf4ExtraConfig:
+    nova::compute::libvirt::vncserver_listen: "%{hiera('internal_api4')}"
+    nova::compute::vncserver_proxyclient_address: "%{hiera('internal_api4')}"
+    nova::compute::libvirt::virt_type: qemu    
+    nova::compute::libvirt::cpu_mode: "host-passthrough"
+    neutron::agents::ml2::ovs::local_ip: "%{hiera('tenant4')}"
+    cold_migration_ssh_inbound_addr: "%{hiera('internal_api4')}"
+    live_migration_ssh_inbound_addr: "%{hiera('internal_api4')}"
+    nova::migration::libvirt::live_migration_inbound_addr: "%{hiera('internal_api4')}"
+    nova::my_ip: "%{hiera('internal_api4')}"
+    tripleo::profile::base::database::mysql::client::mysql_client_bind_address: "%{hiera('internal_api4')}"
+    neutron::agents::dhcp::availability_zone: 'leaf4'
+

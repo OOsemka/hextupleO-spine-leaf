@@ -1,0 +1,23 @@
+---
+#-  name: Read passwords file
+#   shell: cat ./passwords.out
+#   register: user_passwords
+
+
+#- debug:
+#    msg: "{{ user_passwords }}"
+
+#- name: Read
+#  debug: msg="echo {{ lookup('csvfile', item +  ' file=./passwords.out col=0 delimiter=,')}}"
+#  with_items: "{{ user_passwords.stdout_lines }}"
+
+#- name:  test
+#  shell: "echo {{ item }}"
+#  with_items: "{{ user_passwords.stdout_lines }}"
+
+- name: Read users from CSV file and return a list
+  read_csv:
+    path: files/passwords.out
+  register: users 
+  tags:
+    - learnusers 

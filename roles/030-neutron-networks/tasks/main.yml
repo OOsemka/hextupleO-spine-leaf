@@ -1,0 +1,24 @@
+---
+-  name: Ensure neutron networks are "{{ state }}"
+   os_network:
+     auth:
+       auth_url: "{{ os_auth }}"
+       username: "{{ item[0].username }}"
+       password: "{{ item[0].password }}"
+       project_name: "{{ item[0].username }}-{{ item[1] }}"
+       domain_id: "{{ domain_id }}"
+     state: "{{ state }}"
+     name: "{{ item[2].name }}"
+     port_security_enabled: False
+     validate_certs: False
+   with_nested:
+     - "{{ users.list }}"
+     - "{{ Projects }}"
+     - "{{ networks }}"
+   async: 7200
+   poll: 0
+
+   tags:
+     - networks
+
+

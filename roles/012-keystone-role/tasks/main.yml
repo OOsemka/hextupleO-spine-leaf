@@ -1,0 +1,24 @@
+---
+
+-  name: Ensure users are assigned to role _member_ for the projects
+   os_user_role:
+     auth:
+       auth_url: "{{ os_auth }}"
+       username: "{{ cloud_admin }}"
+       password: "{{ admin_password }}"
+       project_name: "{{ admin_project }}"
+       domain_id: "{{ domain_id }}"
+     state: "{{ state }}"
+     user: "{{ item[0].username }}"
+     role: _member_
+     project: "{{ item[0].username }}-{{ item[1] }}"
+     endpoint_type: admin
+     validate_certs: False
+   environment:
+     OS_IDENTITY_API_VERSION: 3
+     OS_PROJECT_DOMAIN_NAME: Default
+     OS_USER_DOMAIN_NAME: Default
+   tags: role
+   with_nested:
+     - "{{ users.list }}"
+     - "{{ Projects }}"

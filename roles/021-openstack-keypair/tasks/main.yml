@@ -1,0 +1,22 @@
+---
+- name: upload keypair for ansible server
+  os_keypair:
+    auth:
+      auth_url: "{{ os_auth }}"
+      username: "{{ item.username }}"
+      password: "{{ item.password }}"
+      project_name: "{{ item.username }}-spine_leaf_vanilla"
+      domain_id: "{{ domain_id }}"
+    state: "{{ state }}"
+    name: "{{ keypair }}"
+    validate_certs: False
+    public_key_file: files/id_rsa.pub
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_USER_DOMAIN_NAME: Default
+  tags: keypair
+  with_items:
+    - "{{ users.list }}"
+
+

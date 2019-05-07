@@ -1,0 +1,18 @@
+---
+
+  - name: Create security group
+    os_security_group:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item[0].username }}"
+         password: "{{ item[0].password }}"
+         project_name: "{{ item[0].username }}-{{ item[1] }}"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: ping_ssh
+       description: security group for hextupleO servers
+       validate_certs: False
+    with_nested:
+      - "{{ users.list }}"
+      - "{{ Projects }}"
+

@@ -1,0 +1,27 @@
+---
+
+-  name: Ensure neutron subnets are "{{ state }}"
+   os_subnet:
+     auth:
+       auth_url: "{{ os_auth }}"
+       username: "{{ item[0].username }}"
+       password: "{{ item[0].password }}"
+       project_name: "{{ item[0].username }}-{{ item[1] }}"
+       domain_id: "{{ domain_id }}"
+     state: "{{ state }}"
+     name: "{{ item[2].name }}subnet"
+     network_name: "{{ item[2].name }}"
+     cidr: "{{ item[2].cidr }}"
+     enable_dhcp: false
+     no_gateway_ip: true
+     validate_certs: False
+   with_nested:
+     - "{{ users.list }}"
+     - "{{ Projects }}"
+     - "{{ networks }}"
+   async: 7200
+   poll: 0
+
+   tags:
+     - subnets
+

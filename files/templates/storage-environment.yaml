@@ -1,0 +1,9 @@
+parameter_defaults:
+  CinderEnableIscsiBackend: true
+  CinderEnableRbdBackend: false
+  CinderBackupBackend: nfs
+  NovaEnableRbdBackend: false
+  GlanceBackend: file
+  GnocchiBackend: file
+
+

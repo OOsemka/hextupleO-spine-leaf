@@ -1,0 +1,51 @@
+---
+- name: Create Spine Leaf Labs
+  hosts:
+    - localhost
+  vars_files:
+    - vars/static-vars.yml
+    - vars/create-vars.yml
+  
+
+  tasks:
+  roles: 
+    - role: 009-generate-passwords
+    - role: 101-learn-users
+    - role: 010-keystone-project
+    - role: 011-keystone-user
+    - role: 012-keystone-role  
+    - role: 013-keystone-admin-role
+
+    - role: 021-openstack-keypair
+    #- role: 022-openstack-secgroup
+    - role: 023-openstack-secgroup-rules
+
+    - role: 030-neutron-networks
+    - role: 031-neutron-subnets
+
+    - role: 050-nova-instances-vanilla
+    - role: 051-nova-stop-instances-vanilla
+
+    - role: 060-learn-instances-facts
+    - role: 061-create-instackenv
+    - role: 065-utility-node
+    - role: 066-vyos-nodes    
+
+    - role: 110-undercloud-inventory
+    - role: 111-send-instack
+
+
+
+- name: Prepare undercloud
+  hosts: openstack_undercloud
+  become: true
+
+  vars_files:
+    - vars/static-vars.yml
+    - vars/dynamic-vars.yml
+    - vars/create-vars.yml
+
+
+  tasks:
+  roles:
+    - role: 120-customize-undercloud

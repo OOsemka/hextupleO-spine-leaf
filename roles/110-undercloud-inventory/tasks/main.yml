@@ -1,0 +1,52 @@
+---
+- name: Gathering facts on undercloud instance
+  os_server_facts:
+    auth:
+       auth_url: "{{ os_auth }}"
+       username: "{{ item.username }}"
+       password: "{{ item.password }}"
+       project_name: "{{ item.username }}-spine_leaf_vanilla"
+       domain_id: "{{ domain_id }}"
+    server: undercloud
+    validate_certs: False
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_USER_DOMAIN_NAME: Default
+  register: undercloud
+  with_items:
+     - "{{ users.list }}"
+  tags:
+    - undercloud
+
+- debug: 
+    var: undercloud
+  tags: undercloud
+
+
+- name: add undercloud to ansible inventory
+  add_host:
+     name: "{{item.item.username}}_undercloud"
+     groups: openstack_undercloud
+     ansible_host: "{{item.ansible_facts.openstack_servers.0.public_v4}}"
+     ansible_user: stack
+     ansible_become: true
+  with_items: "{{undercloud.results}}"
+  tags:
+    - undercloud
+
+
+
+- name: verify undercloud is up and reachable
+  command: >
+    ssh -o BatchMode=yes -o StrictHostKeyChecking=no
+    stack@{{item.ansible_facts.openstack_servers.0.public_v4}} true
+  register: result
+  until: result|success
+  retries: 10
+  delay: 5
+  with_items: "{{undercloud.results}}"
+  tags:
+    - undercloud
+
+

@@ -1,0 +1,20 @@
+---
+
+  - name: learn instance facts
+    os_server_facts:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       validate_certs: False
+       #server: "{{ item[1] }}"
+    with_items:
+      - "{{ users.list }}"
+    register: openstack_instances
+    tags: learn_instances
+ 
+  - debug:
+       msg: "{{ openstack_instances.results }}"
+    tags: learn_instances

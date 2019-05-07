@@ -1,0 +1,72 @@
+---
+
+
+
+
+  - name: stop instance controllers
+    os_server_action:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       action: stop
+       validate_certs: False
+       server: controller
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_PROJECT_DOMAIN_NAME: Default
+      OS_USER_DOMAIN_NAME: Default
+    async: 45
+    poll: 0
+    with_items:
+      - "{{ users.list }}"
+    tags: stop_instances_vanilla
+
+
+
+  - name: stop instance computes 1
+    os_server_action:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       action: stop
+       validate_certs: False
+       server: compute1
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_PROJECT_DOMAIN_NAME: Default
+      OS_USER_DOMAIN_NAME: Default
+    async: 45
+    poll: 0
+    with_items:
+      - "{{ users.list }}"
+    tags: stop_instances_vanilla
+
+
+
+  - name: stop instance computes 2
+    os_server_action:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       action: stop
+       validate_certs: False
+       server: compute2
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_PROJECT_DOMAIN_NAME: Default
+      OS_USER_DOMAIN_NAME: Default
+    async: 45
+    poll: 0
+    with_items:
+      - "{{ users.list }}"
+    tags: stop_instances_vanilla
+

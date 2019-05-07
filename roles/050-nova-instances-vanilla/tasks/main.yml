@@ -1,0 +1,165 @@
+---
+
+  - name: deploy instance undercloud
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: undercloud
+       image: "{{ undercloud_vanilla_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_undercloud }}"
+       auto_ip: no
+       #security_groups: ping_ssh
+       validate_certs: False
+       nics:
+         - net-name: external1
+         - net-name: provisioning1
+         - net-name: external
+    register: undercloud
+    with_items:
+       - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: undercloud_instances
+    tags:
+       - instances
+
+  - name: Wait for undercloud-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: undercloud_jobs
+    until: undercloud_jobs.finished
+    retries: 300
+    with_items: "{{ undercloud_instances.results }}"
+    tags: instances
+
+
+  - name: deploy instance controllers
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: controller
+       image: "{{ pxe_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_controller }}"
+       auto_ip: no
+       #security_groups: default
+       validate_certs: False
+       nics:
+         - net-name: provisioning2
+         - net-name: external2 
+         - net-name: internalAPI2
+         - net-name: tenant2
+         - net-name: storage2
+         - net-name: storagemgmt2
+         - net-name: provider2
+    with_items:
+      - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: controller_instances
+    tags:
+       - instances
+
+
+  - name: Wait for controller-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: controller_jobs
+    until: controller_jobs.finished
+    retries: 300
+    with_items: "{{ controller_instances.results }}"
+    tags: stop_instances_vanilla
+
+
+
+  - name: deploy instance compute1
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: compute1
+       image: "{{ pxe_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_compute }}"
+       auto_ip: no
+       #security_groups: default
+       validate_certs: False
+       nics:
+         - net-name: provisioning3
+         - net-name: internalAPI3
+         - net-name: tenant3
+         - net-name: storage3
+         - net-name: storagemgmt3
+         - net-name: provider3
+    with_items:
+      - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: compute1_instances
+    tags:
+       - instances
+
+
+  - name: Wait for compute-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: compute_jobs
+    until: compute_jobs.finished
+    retries: 300
+    with_items: "{{ compute1_instances.results }}"
+    tags: stop_instances_vanilla
+
+
+
+  - name: deploy instance compute2
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}" 
+       state: "{{ state }}"
+       name: compute2
+       image: "{{ pxe_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_compute }}"
+       auto_ip: no
+       security_groups: default
+       validate_certs: False
+       nics:
+         - net-name: provisioning4
+         - net-name: internalAPI4
+         - net-name: tenant4
+         - net-name: storage4
+         - net-name: storagemgmt4
+         - net-name: provider4
+    with_items:
+      - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: compute2_instances
+    tags:
+       - instances
+
+
+  - name: Wait for compute-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: compute_jobs
+    until: compute_jobs.finished
+    retries: 300
+    with_items: "{{ compute2_instances.results }}"
+    tags: stop_instances_vanilla
+

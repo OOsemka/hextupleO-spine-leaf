@@ -1,0 +1,278 @@
+---
+
+  - name: deploy instance vyos-1
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: vyos-leaf-1
+       image: "{{ vyos_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_vyos }}"
+       config_drive: True
+       userdata: |
+         {%- raw -%}#!/bin/vbash
+         source /opt/vyatta/etc/functions/script-template
+         set interfaces ethernet eth0 address 10.254.1.1/24
+         set interfaces ethernet eth1 address 10.1.1.1/24
+         set interfaces ethernet eth2 address 10.10.1.1/24
+         set protocols ospf area 0 network 10.0.0.0/8
+         set service dhcp-relay interface eth0
+         set service dhcp-relay interface eth1
+         set service dhcp-relay interface eth2
+         set service dhcp-relay server 10.10.1.10
+         set service dhcp-relay server 10.10.1.11
+         set service dhcp-relay server 10.10.1.50
+         set system host-name vyos-leaf-1
+         set system domain-name spineleaf.lab
+         set system login user vyos authentication plaintext-password student
+         set service ssh port 22
+         set service ssh listen-address 10.254.1.1
+         commit
+         save
+         {% endraw %}
+       auto_ip: no
+       validate_certs: False
+       nics:
+         - net-name: transit
+         - net-name: external1
+         - net-name: provisioning1
+    with_items:
+       - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: vyos1_instances
+    tags:
+       - vyos
+
+  - name: Wait for vyos1-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: vyos1_jobs
+    until: vyos1_jobs.finished
+    retries: 300
+    with_items: "{{ vyos1_instances.results }}"
+    tags: vyos
+
+
+  - name: deploy instance vyos-2
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: vyos-leaf-2
+       image: "{{ vyos_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_vyos }}"
+       config_drive: True
+       userdata: |
+         {%- raw -%}#!/bin/vbash
+         source /opt/vyatta/etc/functions/script-template
+         set interfaces ethernet eth0 address 10.254.1.2/24
+         set interfaces ethernet eth1 address 10.1.2.1/24
+         set interfaces ethernet eth2 address 10.10.2.1/24
+         set interfaces ethernet eth3 address 10.20.2.1/24
+         set interfaces ethernet eth4 address 10.30.2.1/24
+         set interfaces ethernet eth5 address 10.40.2.1/24
+         set interfaces ethernet eth6 address 10.50.2.1/24
+         set interfaces ethernet eth7 address 10.60.2.1/24
+         set protocols ospf area 0 network 10.0.0.0/8
+         set service dhcp-relay interface eth0
+         set service dhcp-relay interface eth1
+         set service dhcp-relay interface eth2
+         set service dhcp-relay interface eth3
+         set service dhcp-relay interface eth4
+         set service dhcp-relay interface eth5
+         set service dhcp-relay interface eth6
+         set service dhcp-relay interface eth7
+         set service dhcp-relay server 10.10.1.10
+         set service dhcp-relay server 10.10.1.11
+         set service dhcp-relay server 10.10.1.50
+         set system host-name vyos-leaf-2
+         set system domain-name spineleaf.lab
+         set service ssh port 22
+         set service ssh listen-address 10.254.1.2
+         set system login user vyos authentication plaintext-password student
+         commit
+         save
+         {% endraw %}
+       auto_ip: no
+       validate_certs: False
+       nics:
+         - net-name: transit
+         - net-name: external2
+         - net-name: provisioning2
+         - net-name: internalAPI2
+         - net-name: tenant2
+         - net-name: storage2
+         - net-name: storagemgmt2
+         - net-name: provider2
+    with_items:
+       - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: vyos2_instances
+    tags:
+       - vyos
+
+  - name: Wait for vyos2-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: vyos2_jobs
+    until: vyos2_jobs.finished
+    retries: 300
+    with_items: "{{ vyos2_instances.results }}"
+    tags: vyos
+
+
+
+  - name: deploy instance vyos-3
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: vyos-leaf-3
+       image: "{{ vyos_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_vyos }}"
+       config_drive: True
+       userdata: |
+         {%- raw -%}#!/bin/vbash
+         source /opt/vyatta/etc/functions/script-template
+         set interfaces ethernet eth0 address 10.254.1.3/24
+         set interfaces ethernet eth1 address 10.10.3.1/24
+         set interfaces ethernet eth2 address 10.20.3.1/24
+         set interfaces ethernet eth3 address 10.30.3.1/24
+         set interfaces ethernet eth4 address 10.40.3.1/24
+         set interfaces ethernet eth5 address 10.50.3.1/24
+         set interfaces ethernet eth6 address 10.60.3.1/24
+         set protocols ospf area 0 network 10.0.0.0/8
+         set service dhcp-relay interface eth0
+         set service dhcp-relay interface eth1
+         set service dhcp-relay interface eth2
+         set service dhcp-relay interface eth3
+         set service dhcp-relay interface eth4
+         set service dhcp-relay interface eth5
+         set service dhcp-relay interface eth6
+         set service dhcp-relay server 10.10.1.10
+         set service dhcp-relay server 10.10.1.11
+         set service dhcp-relay server 10.10.1.50
+         set system host-name vyos-leaf-3
+         set system domain-name spineleaf.lab
+         set service ssh port 22
+         set service ssh listen-address 10.254.1.3
+         set system login user vyos authentication plaintext-password student
+         commit
+         save
+         {% endraw %}
+       auto_ip: no
+       validate_certs: False
+       nics:
+         - net-name: transit
+         - net-name: provisioning3
+         - net-name: internalAPI3
+         - net-name: tenant3
+         - net-name: storage3
+         - net-name: storagemgmt3
+         - net-name: provider3
+    with_items:
+       - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: vyos3_instances
+    tags:
+       - vyos
+
+  - name: Wait for vyos3-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: vyos3_jobs
+    until: vyos3_jobs.finished
+    retries: 300
+    with_items: "{{ vyos3_instances.results }}"
+    tags: vyos
+
+
+  - name: deploy instance vyos-4
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: vyos-leaf-4
+       image: "{{ vyos_image }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_vyos }}"
+       config_drive: True
+       userdata: |
+         {%- raw -%}#!/bin/vbash
+         source /opt/vyatta/etc/functions/script-template
+         set interfaces ethernet eth0 address 10.254.1.4/24
+         set interfaces ethernet eth1 address 10.10.4.1/24
+         set interfaces ethernet eth2 address 10.20.4.1/24
+         set interfaces ethernet eth3 address 10.30.4.1/24
+         set interfaces ethernet eth4 address 10.40.4.1/24
+         set interfaces ethernet eth5 address 10.50.4.1/24
+         set interfaces ethernet eth6 address 10.60.4.1/24
+         set protocols ospf area 0 network 10.0.0.0/8
+         set service dhcp-relay interface eth0
+         set service dhcp-relay interface eth1
+         set service dhcp-relay interface eth2
+         set service dhcp-relay interface eth3
+         set service dhcp-relay interface eth4
+         set service dhcp-relay interface eth5
+         set service dhcp-relay interface eth6
+         set service dhcp-relay server 10.10.1.10
+         set service dhcp-relay server 10.10.1.11
+         set service dhcp-relay server 10.10.1.50
+         set system host-name vyos-leaf-4
+         set system domain-name spineleaf.lab
+         set service ssh port 22
+         set service ssh listen-address 10.254.1.4
+         set system login user vyos authentication plaintext-password student
+         commit
+         save
+         {% endraw %}
+       auto_ip: no
+       validate_certs: False
+       nics:
+         - net-name: transit
+         - net-name: provisioning4
+         - net-name: internalAPI4
+         - net-name: tenant4
+         - net-name: storage4
+         - net-name: storagemgmt4
+         - net-name: provider4
+    with_items:
+       - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: vyos4_instances
+    tags:
+       - vyos
+
+
+  - name: Wait for vyos4-instance creation to complete
+    async_status: jid={{ item.ansible_job_id }}
+    register: vyos4_jobs
+    until: vyos4_jobs.finished
+    retries: 300
+    with_items: "{{ vyos4_instances.results }}"
+    tags: vyos
+
+
+
+
+

@@ -1,0 +1,334 @@
+heat_template_version: rocky
+description: >
+  Software Config to drive os-net-config to configure multiple interfaces for the ControllerLeaf2 role.
+parameters:
+  ControlPlaneIp:
+    default: ''
+    description: IP address/subnet on the ctlplane network
+    type: string
+  ControlPlaneSubnetCidr:
+    default: ''
+    description: >
+      The subnet CIDR of the control plane network. (The parameter is
+      automatically resolved from the ctlplane subnet's cidr attribute.)
+    type: string
+  ControlPlane2SubnetCidr:
+    default: ''
+    description: >
+      The subnet CIDR of the control plane network. (The parameter is
+      automatically resolved from the ctlplane subnet's cidr attribute.)
+    type: string
+  ControlPlaneDefaultRoute:
+    default: ''
+    description: The default route of the control plane network. (The parameter
+      is automatically resolved from the ctlplane subnet's gateway_ip attribute.)
+    type: string
+  ControlPlane2DefaultRoute:
+    default: ''
+    description: The default route of the control plane network. (The parameter
+      is automatically resolved from the ctlplane subnet's gateway_ip attribute.)
+    type: string
+
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api2 network
+    type: string
+  InternalApiInterfaceDefaultRoute:
+    default: '10.20.2.1'
+    description: default route for the internal_api2 network
+    type: string
+  InternalApiInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the internal_api2 network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api2 network
+    type: string
+  StorageInterfaceDefaultRoute:
+    default: '10.40.2.1'
+    description: default route for the internal_api2 network
+    type: string
+
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api2 network
+    type: string
+  StorageMgmtInterfaceDefaultRoute:
+    default: '10.50.2.1'
+    description: default route for the internal_api2 network
+    type: string
+
+
+  InternalApi3IpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api3 network
+    type: string
+  InternalApi3InterfaceDefaultRoute:
+    default: '10.20.3.1'
+    description: default route for the internal_api3 network
+    type: string
+  InternalApi3InterfaceRoutes:
+    default: []
+    description: >
+      Routes for the internal_api3 network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  InternalApi4IpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api4 network
+    type: string
+  InternalApi4InterfaceDefaultRoute:
+    default: '10.20.4.1'
+    description: default route for the internal_api4 network
+    type: string
+  InternalApi4InterfaceRoutes:
+    default: []
+    description: >
+      Routes for the internal_api4 network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the Tenant network
+    type: string
+  TenantInterfaceDefaultRoute:
+    default: '10.30.2.1'
+    description: default route for the Tenant network
+    type: string
+  TenantInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the Tenant network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  Tenant3IpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant3 network
+    type: string
+  Tenant3InterfaceDefaultRoute:
+    default: '10.30.3.1'
+    description: default route for the tenant3 network
+    type: string
+  Tenant3InterfaceRoutes:
+    default: []
+    description: >
+      Routes for the tenant3 network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  Tenant4IpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant4 network
+    type: string
+  Tenant4InterfaceDefaultRoute:
+    default: '10.30.4.1'
+    description: default route for the tenant4 network
+    type: string
+  Tenant4InterfaceRoutes:
+    default: []
+    description: >
+      Routes for the tenant4 network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the External network
+    type: string
+  ExternalInterfaceDefaultRoute:
+    default: '10.1.2.1'
+    description: default route for the External network
+    type: string
+  ExternalInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the External network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+
+  StorageInterfaceRoutes:
+    default: []
+    description: ''
+    type: json
+  StorageMgmtInterfaceRoutes:
+    default: []
+    description: ''
+    type: json
+  Storage3InterfaceRoutes:
+    default: []
+    description: ''
+    type: json
+  StorageMgmt3InterfaceRoutes:
+    default: []
+    description: ''
+    type: json
+  Storage4InterfaceRoutes:
+    default: []
+    description: ''
+    type: json
+  StorageMgmt4InterfaceRoutes:
+    default: []
+    description: ''
+    type: json
+
+
+  DnsServers: # Override this via parameter_defaults
+    default: []
+    description: >
+      DNS servers to use for the Overcloud (2 max for some implementations).
+      If not set the nameservers configured in the ctlplane subnet's
+      dns_nameservers attribute will be used.
+    type: comma_delimited_list
+  EC2MetadataIp:
+    default: ''
+    description: The IP address of the EC2 metadata server. (The parameter
+      is automatically resolved from the ctlplane subnet's host_routes attribute.)
+    type: string
+  Leaf2EC2MetadataIp:
+    default: ''
+    description: The IP address of the EC2 metadata server. (The parameter
+      is automatically resolved from the ctlplane subnet's host_routes attribute.)
+    type: string
+  InternalApiSupernet:
+    default: ''
+    description: IP address/subnet of the internal api supernet
+    type: string
+  TenantSupernet:
+    default: ''
+    description: IP address/subnet of the internal api supernet
+    type: string
+
+  StorageSupernet:
+    default: ''
+    description: IP address/subnet of the internal api supernet
+    type: string
+
+  StorageMgmtSupernet:
+    default: ''
+    description: IP address/subnet of the internal api supernet
+    type: string
+
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template:
+            get_file: /usr/share/openstack-tripleo-heat-templates/network/scripts/run-os-net-config.sh
+          params:
+            $network_config:
+              network_config:
+              - type: interface
+                name: eth0
+                use_dhcp: false
+                dns_servers:
+                  get_param: DnsServers
+                addresses:
+                - ip_netmask:
+                    list_join:
+                    - /
+                    - - get_param: ControlPlaneIp
+                      - get_param: ControlPlane2SubnetCidr
+                routes:
+                - ip_netmask: 169.254.169.254/32
+                  next_hop:
+                    get_param: Leaf2EC2MetadataIp
+                - ip_netmask: 10.10.0.0/16
+                  next_hop:
+                    get_param: ControlPlane2DefaultRoute
+              - type: interface
+                name: eth2
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: InternalApiIpSubnet
+                routes:
+                - ip_netmask:
+                    get_param: InternalApiSupernet
+                  next_hop:
+                    get_param: InternalApiInterfaceDefaultRoute
+
+              - type: interface
+                name: eth3
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: TenantIpSubnet
+                routes:
+                - ip_netmask:
+                    get_param: TenantSupernet
+                  next_hop:
+                    get_param: TenantInterfaceDefaultRoute
+
+
+              - type: interface
+                name: eth4
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: StorageIpSubnet
+                routes:
+                - ip_netmask:
+                    get_param: StorageSupernet
+                  next_hop:
+                    get_param: StorageInterfaceDefaultRoute
+              - type: interface
+                name: eth5
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: StorageMgmtIpSubnet
+                routes:
+                - ip_netmask:
+                    get_param: StorageMgmtSupernet
+                  next_hop:
+                    get_param: StorageMgmtInterfaceDefaultRoute
+              - type: interface
+                name: eth1
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: ExternalIpSubnet
+                routes:
+                - ip_netmask: 0.0.0.0/0
+                  next_hop:
+                    get_param: ExternalInterfaceDefaultRoute
+              - type: ovs_bridge
+                name: br-provider 
+                use_dhcp: false
+                members:
+                - type: interface
+                  name: eth6
+                  use_dhcp: false
+                  defroute: false
+              - type: ovs_bridge
+                name: br-provider3 
+                use_dhcp: false
+              - type: ovs_bridge
+                name: br-provider4 
+                use_dhcp: false
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value:
+      get_resource: OsNetConfigImpl

@@ -1,0 +1,6 @@
+#!/bin/bash
+source ~/stackrc
+for i in `openstack baremetal port list -f value -c UUID --node controller`; do openstack baremetal port set --physical-network leaf2 $i; done
+for i in `openstack baremetal port list -f value -c UUID --node compute1`; do openstack baremetal port set --physical-network leaf3 $i; done
+for i in `openstack baremetal port list -f value -c UUID --node compute2`; do openstack baremetal port set --physical-network leaf4 $i; done
+

@@ -1,0 +1,19 @@
+parameter_defaults:
+  ControllerLeaf2Flavor: baremetal
+  ControllerLeaf2Count: 1
+  ComputeLeaf3Flavor: baremetal
+  ComputeLeaf3Count: 1
+  ComputeLeaf4Flavor: baremetal
+  ComputeLeaf4Count: 1
+
+  ControllerLeaf2SchedulerHints:
+    'capabilities:node': 'controller-leaf2-%index%'
+  ComputeLeaf3SchedulerHints:
+    'capabilities:node': 'compute-leaf3-%index%'
+  ComputeLeaf4SchedulerHints:
+    'capabilities:node': 'compute-leaf4-%index%'
+
+  HostnameMap:
+    overcloud-controllerleaf2-0: controller0-leaf2
+    overcloud-computeleaf3-0: compute0-leaf3
+    overcloud-computeleaf4-0: compute1-leaf4

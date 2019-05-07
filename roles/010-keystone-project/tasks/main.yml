@@ -1,0 +1,21 @@
+---
+-  name: Ensure vanilla projects is "{{ state }}"
+   os_project:
+     auth:
+       auth_url: "{{ os_auth }}"
+       username: "{{ cloud_admin }}"
+       password: "{{ admin_password }}"
+       project_name: "{{ admin_project }}"
+     domain_id: "{{ domain_id }}"
+     state: "{{ state }}"
+     endpoint_type: admin
+     name: "{{ item.username }}-spine_leaf_vanilla"
+     enabled: True
+     validate_certs: False
+   environment:
+     OS_IDENTITY_API_VERSION: 3
+     OS_PROJECT_DOMAIN_NAME: Default
+     OS_USER_DOMAIN_NAME: Default
+   tags: project
+   with_items:
+     - "{{ users.list }}"

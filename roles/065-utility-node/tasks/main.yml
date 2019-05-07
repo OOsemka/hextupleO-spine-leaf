@@ -1,0 +1,30 @@
+---
+
+  - name: utility node
+    os_server:
+       auth:
+         auth_url: "{{ os_auth }}"
+         username: "{{ item.username }}"
+         password: "{{ item.password }}"
+         project_name: "{{ item.username }}-spine_leaf_vanilla"
+         domain_id: "{{ domain_id }}"
+       state: "{{ state }}"
+       name: utility
+       image: "{{ utility }}"
+       key_name: "{{ keypair }}"
+       flavor: "{{ flavor_utility }}"
+       auto_ip: no
+       #security_groups: ping_ssh
+       validate_certs: False
+       nics:
+         - net-name: provisioning1
+    register: utility
+    with_items:
+       - "{{ users.list }}"
+    async: 7200
+    poll: 0
+    register: utility_instances
+    tags:
+       - utility
+
+

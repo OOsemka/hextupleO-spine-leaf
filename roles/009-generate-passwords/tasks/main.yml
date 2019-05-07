@@ -1,0 +1,38 @@
+---
+
+- name: check if user file exists
+  stat: 
+    path: files/passwords.out
+  register: userfile
+  tags: create_users
+
+
+- command: echo "{{ pwd_alias }}"
+  register: user_passwords
+  with_sequence:
+    count="{{ user_count }}"
+  when: userfile.stat.exists == false
+  tags: create_users
+
+- debug:
+    msg: "user-{{ item.item}}: {{ item.stdout }}"
+  with_items:
+    - "{{ user_passwords.results }}"
+  when: userfile.stat.exists == false
+  tags: create_users
+
+
+#- local_action: file state=absent path=./passwords.out
+
+- local_action: lineinfile line="username,password" create=yes path=files/passwords.out
+  when: userfile.stat.exists == false
+  tags: create_users
+
+
+- local_action: lineinfile line="user{{item.item}},{{ item.stdout }}" create=yes path=files/passwords.out
+  with_items:
+    - "{{ user_passwords.results }}"
+  when: userfile.stat.exists == false
+  tags: create_users
+
+

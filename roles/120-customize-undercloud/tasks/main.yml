@@ -1,0 +1,137 @@
+---
+
+  - name: Authorize AWS key
+    lineinfile:
+       path: /home/stack/.ssh/authorized_keys
+       state: present
+       line: "{{ aws_key }}"
+    tags:
+       - customize_undercloud
+
+
+  - name: upload yum repo file to image
+    copy: src=files/osp14.repo dest=/etc/yum.repos.d/
+    become: yes
+    tags:
+       - customize_undercloud
+
+
+  - name: copy eth0 network file
+    copy: src=files/{{ item }} dest=/etc/sysconfig/network-scripts/ owner=root mode=0644
+    with_items:
+       - ifcfg-eth0
+       - route-eth0
+    tags:
+       - customize_undercloud
+
+
+  - name: set up hostname and IP, remove cloud-init, remove virsh networks, allow async routing
+    shell: |
+       hostnamectl set-hostname undercloud.spineleaf.lab
+       ifup eth0
+       ip a a 10.1.1.10/24 dev eth0
+       ip route add 10.0.0.0/8 via 10.1.1.1 dev eth0
+       yum -y remove cloud-init
+       virsh net-destroy default
+       virsh net-autostart --network default --disable
+       echo 2 > /proc/sys/net/ipv4/conf/default/rp_filter
+       echo 2 > /proc/sys/net/ipv4/conf/all/rp_filter
+       echo net.ipv4.conf.all.rp_filter=2 > /etc/sysctl.d/10-async-route.conf
+    become: yes
+    tags:
+       - customize_undercloud
+
+
+  - name: Create Stack sub-directories
+    file:
+      path: /home/stack/{{ item }}
+      state: directory
+      mode: 0755
+      owner: stack
+      group: stack
+    with_items:
+       - GoodieBag
+       - GoodieBag/templates
+       - GoodieBag/templates/nics
+       - images
+       - templates
+       - templates/nics
+    tags:
+       - customize_undercloud
+
+  - name: copy Goodies to GoodieBag to stack
+    copy: src=files/{{ item }} dest=/home/stack/GoodieBag/ owner=stack group=stack mode=0744
+    with_items:
+      - ipmitool
+      - undercloud.conf
+      - containers-prepare-parameter.yaml
+      - deploy.sh
+      - undercloud-custom.yaml
+      - set-phys-nets
+      - cirros.img
+    tags:
+       - customize_undercloud
+       - copy
+
+  - name: copy Goodies to GoodieBagi/templates to stack
+    copy: src=files/templates/{{item}} dest=/home/stack/GoodieBag/templates/ owner=stack group=stack mode=0744
+    with_items:
+      - network_data.yaml
+      - network-environment.yaml
+      - node_data.yaml
+      - roles_data.yaml
+      - storage-environment.yaml
+    tags:
+       - customize_undercloud
+       - copy
+
+  - name: copy Goodies to GoodieBagi/templates/nics to stack
+    copy: src=files/templates/nics/{{item}} dest=/home/stack/GoodieBag/templates/nics/ owner=stack group=stack mode=0744
+    with_items:
+      - controllerleaf2.yaml
+      - computeleaf3.yaml
+      - computeleaf4.yaml
+    tags:
+       - customize_undercloud
+       - copy
+
+
+
+  - name: rhel7.4 adds requiretty .. removing that option
+    become: yes
+    lineinfile:
+      path: /etc/sudoers
+      state: present
+      regexp: 'Defaults    requiretty.*'
+      line: '#Defaults    requiretty'
+    tags:
+       - customize_undercloud
+       - ipmi
+
+
+  - name: install fix-ironic daemon 1
+    copy: src=files/fix-ironic dest=/usr/bin/ owner=root group=root mode=0755
+    become: yes
+    tags:
+       - customize_undercloud
+       - ipmi
+
+
+  - name: install fix-ironic daemon 2
+    copy: src=files/fix-ironic.service dest=/usr/lib/systemd/system/ owner=root group=root mode=0644
+    become: yes
+    tags:
+       - customize_undercloud
+       - ipmi
+
+  - name: issue daemon-reload to pick up config changes
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      name: fix-ironic
+      enabled: yes
+    become: yes
+    tags:
+       - customize_undercloud
+       - ipmi
+

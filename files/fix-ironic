@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+#####################################
+# Script that prevents ironic from checking ip address at the time of TrieplO introspection
+# This scripts modifies /usr/lib/python2.7/site-packages/ironic_inspector/common/ironic.py if needed and replaces ipmitool with the OpenStack modified version
+# this is needed to allow modified ipmitool function for OpenStack instances
+#####################################
+
+ironicscript="/usr/lib/python2.7/site-packages/ironic_inspector/common/ironic.py"
+ipmtoolscript="$(find /home/stack -type f -name ipmitool | head -1)"
+
+while true; do
+
+  if [[ ! -f "${ipmtoolscript}" ]]
+  then
+    echo "ERROR: $0 can't locate the HextupleO ipmitool. You may have issues with ironic." > ~stack/hextupleo.ERROR_MSG
+  fi
+
+  if [[ ! -z "$(sudo docker ps | grep ironic)" ]]
+  then
+    for CONTAINER in $(sudo docker ps | grep ironic | awk '{print $NF}')
+    do
+      ipmitoolwc=$(sudo docker exec -u root -i ${CONTAINER} wc -l /usr/bin/ipmitool | awk {'print $1'} | sed 's/wc://g')
+      if [[ ! -z "${ipmitoolwc}" ]]
+      then
+        if [ ${ipmitoolwc} != 82 ]; then
+          echo "unmodified ipmitool file detected"
+          echo "Waiting for the image to come up to prevent installation issues"
+          sleep 120
+          sudo docker exec -u root -i ${CONTAINER} cp -p /usr/bin/ipmitool /usr/bin/ipmitool.orig
+          sudo docker exec -u root -i ${CONTAINER} /bin/bash -c "cat >/usr/bin/ipmitool" <${ipmtoolscript}
+          sudo docker exec -u root -i ${CONTAINER} chown root:root /usr/bin/ipmitool
+          sudo docker exec -u root -i ${CONTAINER} chmod +x /usr/bin/ipmitool
+          sudo docker restart ${CONTAINER}
+        fi
+      fi
+      ironic_py=$(sudo docker exec -u root -i ${CONTAINER} ls ${ironicscript} 2>/dev/null)
+      if [[ ! -z "${ironic_py}" ]]
+      then
+        patched_ironic_py=$(sudo docker exec -u root -i ${CONTAINER} grep  '"true" == "true"' $ironicscript)
+        if [[ -z "${patched_ironic_py}" ]]
+        then
+          sudo docker exec -u root -i ${CONTAINER} sed -i '/\ if node\.driver_info\.get/a  \ \ \  if "true" == "true":' ${ironicscript}
+          sudo docker exec -u root -i ${CONTAINER} sed -i "s/\ if node\.driver_info\.get/\ #if node\.driver_info\.get/"  ${ironicscript}
+          sudo docker restart ${CONTAINER}
+        fi
+      fi
+    done
+  fi
+  sleep 30
+done
+
+exit 0
+

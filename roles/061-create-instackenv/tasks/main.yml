@@ -1,0 +1,13 @@
+
+   
+  - name: create instackenv template
+    template:
+      src: "files/instackenv.j2"
+      dest: "files/instackenv/{{item.item.username}}-instackenv.json"
+      mode: 0644
+      #owner: stack
+      #group: stack
+    with_items:
+      - "{{ openstack_instances.results }}"
+    tags: create_instackenv
+
