@@ -11,12 +11,13 @@ ipmtoolscript="$(find /home/stack -type f -name ipmitool | head -1)"
 
 while true; do
 
+  stackexist="$(find /home/stack -type f -name stackrc | head -1)"
   if [[ ! -f "${ipmtoolscript}" ]]
   then
     echo "ERROR: $0 can't locate the HextupleO ipmitool. You may have issues with ironic." > ~stack/hextupleo.ERROR_MSG
   fi
 
-  if [[ ! -z "$(sudo docker ps | grep ironic)" ]]
+  if [[ ! -z "$(sudo docker ps | grep ironic)" && -f "${stackexist}" ]]
   then
     for CONTAINER in $(sudo docker ps | grep ironic | awk '{print $NF}')
     do
